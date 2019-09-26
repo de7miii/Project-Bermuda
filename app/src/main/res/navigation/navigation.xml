@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/home_dest">
+
+    <action
+        android:id="@+id/action_home_to_signup"
+        app:destination="@id/login_navigation"
+        app:popUpTo="@id/login_navigation"/>
+
+    <action
+        android:id="@+id/login_to_home_action"
+        app:popUpTo="@id/home_dest"
+        app:popUpToInclusive="true"
+        app:destination="@id/home_dest" />
+
+    <fragment
+        android:id="@+id/home_dest"
+        android:name="com.example.freelanceproject.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_dest_to_login_navigation"
+            app:destination="@id/login_navigation" />
+    </fragment>
+    <fragment
+        android:id="@+id/search_dest"
+        android:name="com.example.freelanceproject.SearchFragment"
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/profile_dest"
+        android:name="com.example.freelanceproject.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/editProfileAction"
+            app:destination="@id/editProfile_dest"
+            app:popUpTo="@+id/profile_dest" />
+    </fragment>
+    <fragment
+        android:id="@+id/projects_dest"
+        android:name="com.example.freelanceproject.ProjectsFragment"
+        android:label="ProjectsFragment"
+        tools:layout="@layout/fragment_projects" />
+    <fragment
+        android:id="@+id/messaging_dest"
+        android:name="com.example.freelanceproject.MassegingFragment"
+        android:label="MessagingFragment"
+        tools:layout="@layout/fragment_masseging" />
+    <navigation
+        android:id="@+id/login_navigation"
+        app:startDestination="@id/login_dest" >
+        <fragment
+            android:id="@+id/signup_dest"
+            android:name="com.example.freelanceproject.SignupFragment"
+            android:label="SignupFragment"
+            tools:layout="@layout/fragment_signup">
+            <action
+                android:id="@+id/have_account_action"
+                app:destination="@id/login_dest"
+                app:popUpTo="@id/login_dest"/>
+        </fragment>
+        <fragment
+            android:id="@+id/login_dest"
+            android:name="com.example.freelanceproject.LoginFragment"
+            android:label="LoginFragment"
+            tools:layout="@layout/fragment_login">
+            <action
+                android:id="@+id/new_account_action"
+                app:destination="@id/signup_dest" />
+        </fragment>
+        <action
+            android:id="@+id/login_to_home_action"
+            app:popUpTo="@id/home_dest"
+            app:popUpToInclusive="true"
+            app:destination="@id/home_dest" />
+    </navigation>
+    <fragment
+        android:id="@+id/editProfile_dest"
+        android:name="com.example.freelanceproject.EditProfileFragment"
+        android:label="EditProfileFragment"
+        tools:layout="@layout/fragment_edit_profile">
+        <argument
+            android:name="userArg"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+        <action
+            android:id="@+id/editProfileDoneAction"
+            app:destination="@id/profile_dest"
+            app:popUpTo="@+id/profile_dest" />
+    </fragment>
+</navigation>

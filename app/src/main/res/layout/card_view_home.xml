@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<!--    finish the card design-->
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="200dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        app:strokeColor="@color/primaryLightColor"
+        app:cardBackgroundColor="@color/primaryDarkColor"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/display_picture_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/user_profile_content_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/ic_launcher_round"
+                android:foreground="@drawable/image_gradient"/>
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/user_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                style="@style/NameTextStyle"
+                app:layout_constraintStart_toStartOf="@id/display_picture_image_view"
+                app:layout_constraintTop_toTopOf="@id/display_picture_image_view"
+                tools:text="Abdulrahman Daffalla" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/skills_text_view"
+                style="@style/TextOverImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toTopOf="@id/info_linearlayout"
+                app:layout_constraintRight_toRightOf="@id/display_picture_image_view"
+                tools:text="MS Excel, Java, Android" />
+
+            <LinearLayout
+                android:id="@+id/info_linearlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="@id/display_picture_image_view"
+                app:layout_constraintRight_toRightOf="@id/display_picture_image_view">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/cred_score_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    style="@style/TextOverImage"
+                    android:text="Credscore: 230" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/min_rates_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    style="@style/TextOverImage"
+                    android:text="20$" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    style="@style/TextOverImage"
+                    android:text="-" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/max_rates_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/TextOverImage"
+                    android:text="60$" />
+            </LinearLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/description_text_view"
+                style="@style/DescriptionTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/display_picture_image_view"
+                app:layout_constraintVertical_bias="0.0"
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sodales neque nisl, et euismod erat tristique in." />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>
