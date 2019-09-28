@@ -160,13 +160,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     private String getSkillsString(ArrayList<String> skills){
-        String value = "";
+        StringBuilder stringBuilder = new StringBuilder();
         for (String s :
                 skills) {
-            value =  s + ", ";
+            stringBuilder.append(s);
         }
-        return value;
-    }
+        return stringBuilder.toString();
+        }
 
     public void setClientsList(ArrayList<Client> newClientsList){
         mClientsList = newClientsList;
@@ -226,8 +226,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 for (Object obj :
                         itemsFull) {
-                    if (((User)obj).getUserName().contains(filterPattern) || ((User)obj).getName().contains(filterPattern)){
-                        Log.i(TAG, "performFiltering: " + ((User)obj).getUserName());
+                    if (((User)obj).getUserName().toLowerCase().contains(filterPattern)){
+                        Log.i(TAG, "performFiltering: Username: " + ((User)obj).getUserName());
+                        filteredList.add(obj);
+                    }
+                    if (((User)obj).getName().toLowerCase().contains(filterPattern)){
+                        Log.i(TAG, "performFiltering: Name: " + ((User)obj).getName());
                         filteredList.add(obj);
                     }
                 }

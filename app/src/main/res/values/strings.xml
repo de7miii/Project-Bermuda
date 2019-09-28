@@ -29,4 +29,11 @@
     <string name="bottomNav_profile">Profile</string>
     <string name="bottomNav_projects">Projects</string>
     <string name="bottomNav_messages">Messages</string>
+    <string name="pay_rates_header_text">Pay Rates</string>
+    <string name="name_header_text">Name</string>
+    <string name="email_header_text">Email</string>
+    <string name="description_header_text">Description</string>
+    <string name="birth_year_header_text">Birth Year</string>
+    <string name="edit_profile_menu_item_text">Edit Profile</string>
+    <string name="log_out_menu_item_text">Log Out</string>
 </resources>

@@ -13,12 +13,15 @@
         android:title="@string/bottomNav_profile"
         android:icon="@drawable/ic_person_black_24dp"/>
 
-    <item android:id="@+id/projects_dest"
-        android:title="@string/bottomNav_projects"
-        android:icon="@drawable/ic_laptop_chromebook_black_24dp"/>
 
-    <item android:id="@+id/messaging_dest"
-        android:title="@string/bottomNav_messages"
-        android:icon="@drawable/ic_chat_black_24dp"/>
+<!--    Projects and Messaging pages to be added later-->
+
+<!--    <item android:id="@+id/projects_dest"-->
+<!--        android:title="@string/bottomNav_projects"-->
+<!--        android:icon="@drawable/ic_laptop_chromebook_black_24dp"/>-->
+
+<!--    <item android:id="@+id/messaging_dest"-->
+<!--        android:title="@string/bottomNav_messages"-->
+<!--        android:icon="@drawable/ic_chat_black_24dp"/>-->
 
 </menu>

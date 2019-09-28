@@ -8,14 +8,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -25,18 +24,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.freelanceproject.Adapters.ProjectAdapter;
+import com.example.freelanceproject.BusinessModel.Client;
+import com.example.freelanceproject.BusinessModel.Freelancer;
 import com.example.freelanceproject.BusinessModel.Project;
 import com.example.freelanceproject.BusinessModel.User;
 import com.example.freelanceproject.Util.SaveSharedPreference;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
+import java.util.Currency;
+import java.util.Locale;
 
 
 /**
@@ -56,12 +59,17 @@ public class ProfileFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProjectAdapter mProjectAdapter;
 
+    private MaterialTextView userSkills, userCred, userMinRate, userMaxRate;
+
     private MainViewModel viewModel;
+    private LoginViewModel loginViewModel;
     private String username;
     private int acc_type;
 
     private ArrayList<Project> mProjectsList;
     private User mUser;
+
+    private Menu mMenu;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -78,7 +86,13 @@ public class ProfileFragment extends Fragment {
         mCollapsingToolbar.setTitleEnabled(true);
         mAppBarLayout = view.findViewById(R.id.container);
         ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+
         mUserImage = view.findViewById(R.id.user_image);
+        userSkills = view.findViewById(R.id.skills_text_view);
+        userCred = view.findViewById(R.id.cred_score_text_view);
+        userMinRate = view.findViewById(R.id.min_rates_text_view);
+        userMaxRate = view.findViewById(R.id.max_rates_text_view);
+        setHasOptionsMenu(true);
 
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             private int scrollRange = -1;
@@ -88,14 +102,17 @@ public class ProfileFragment extends Fragment {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0){
-                    setHasOptionsMenu(true);
+                    MenuItem editProfileItem = mMenu.findItem(R.id.edit_menu_edit_profile_item);
+                    editProfileItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 }else {
-                    setHasOptionsMenu(false);
+                    MenuItem editProfileItem = mMenu.findItem(R.id.edit_menu_edit_profile_item);
+                    editProfileItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 }
             }
         });
 
         viewModel = ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
+        loginViewModel = ViewModelProviders.of(requireActivity()).get(LoginViewModel.class);
         username = SaveSharedPreference.getUsername(getContext());
 
         mProjectAdapter = new ProjectAdapter(getContext());
@@ -133,24 +150,46 @@ public class ProfileFragment extends Fragment {
         }
 
         Log.i(TAG, "onViewCreated: " + viewModel.getUser(username));
-        mUser = viewModel.getUser(username) != null? (User) viewModel.getUser(username) : new User();
+        if (viewModel.getUser(username) != null){
+            switch (acc_type){
+                case Client.CLIENT_ACCOUNT:
+                    mUser = (Client)viewModel.getUser(username);
+                    break;
+                case Client.FREELANCER_ACCOUNT:
+                    mUser = (Freelancer)viewModel.getUser(username);
+                    break;
+            }
+        }
         mProjectsList = mUser.getPortfolio() != null? mUser.getPortfolio().getProjects() : new ArrayList<Project>();
+
+
         mUser.setImgPath("https://via.placeholder.com/350x250.png?text=Placeholder+Image");
         Glide.with(getContext()).load(mUser.getImgPath())
                 .into(mUserImage);
+        userCred.setText("CreadScore: " + Integer.toString(mUser.getCredScore()));
+        if (acc_type == Client.FREELANCER_ACCOUNT){
+            userSkills.setText(getSkillsString(((Freelancer)mUser).getSkills()));
+            userMinRate.setText(mUser.getRatesMin() + Currency.getInstance(Locale.US).getSymbol());
+            userMaxRate.setText(mUser.getRatesMax() + Currency.getInstance(Locale.US).getSymbol());
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.edit, menu);
+        mMenu = menu;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.edit_menu_item:
+            case R.id.edit_menu_edit_profile_item:
                 navigateToEditProfile();
+                return true;
+            case R.id.edit_menu_log_out_item:
+                loginViewModel.logOut(getContext());
+                navController.popBackStack(R.id.home_dest, false);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -162,5 +201,14 @@ public class ProfileFragment extends Fragment {
         ProfileFragmentDirections.EditProfileAction action = ProfileFragmentDirections.editProfileAction();
         action.setUserArg(username);
         navController.navigate(action);
+    }
+
+    private String getSkillsString(ArrayList<String> skills){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s :
+                skills) {
+            stringBuilder.append(s);
+        }
+        return stringBuilder.toString();
     }
 }

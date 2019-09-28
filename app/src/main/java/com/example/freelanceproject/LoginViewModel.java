@@ -1,6 +1,7 @@
 package com.example.freelanceproject;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -47,6 +48,17 @@ public class LoginViewModel extends AndroidViewModel {
 
     public void refuseAuthentication(){
         authenticateState.setValue(AuthenticationState.UNAUTHENTICATED);
+    }
+
+    public boolean logOut(Context context){
+        if (SaveSharedPreference.getLoginStatus(context)){
+            SaveSharedPreference.setLoginStatus(context, false);
+            SaveSharedPreference.removeUsername(context);
+            authenticateState.setValue(AuthenticationState.UNAUTHENTICATED);
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }

@@ -19,7 +19,7 @@
          <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/profile_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:listitem="@layout/card_view_profile">
@@ -102,14 +102,14 @@
                             tools:text="20$" />
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/max_rates_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="4dp"
                             style="@style/TextOverImage"
-                            tools:text="-" />
+                            android:text="-" />
 
                         <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/max_rates_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             style="@style/TextOverImage"

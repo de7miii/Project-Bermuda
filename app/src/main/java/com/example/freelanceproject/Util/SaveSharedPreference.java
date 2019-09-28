@@ -32,6 +32,13 @@ public class SaveSharedPreference {
         editor.apply();
     }
 
+    public static void removeUsername(Context context){
+        SharedPreferences.Editor editor = getSharedPreference(context).edit();
+        editor.remove(USERNAME);
+        editor.remove(ACC_TYPE);
+        editor.apply();
+    }
+
     public static String getUsername(Context context){
         return getSharedPreference(context).getString(USERNAME, "username");
     }
