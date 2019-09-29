@@ -27,7 +27,9 @@ import android.widget.Toast;
 import com.example.freelanceproject.Adapters.PostsAdapter;
 import com.example.freelanceproject.BusinessModel.Client;
 import com.example.freelanceproject.BusinessModel.Freelancer;
+import com.example.freelanceproject.BusinessModel.User;
 import com.example.freelanceproject.Util.AuthenticationState;
+import com.example.freelanceproject.Util.OnPostListner;
 import com.example.freelanceproject.Util.RegistrationState;
 import com.example.freelanceproject.Util.SaveSharedPreference;
 
@@ -37,7 +39,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements OnPostListner {
     private final static  String TAG = HomeFragment.class.getSimpleName();
 
     private MainViewModel viewModel;
@@ -47,6 +49,12 @@ public class HomeFragment extends Fragment {
 
     private LoginViewModel loginViewModel;
     private SignupViewModel signupViewModel;
+
+    private NavController navController;
+
+    private ArrayList<Object> items = new ArrayList<>();
+
+    private String username;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -60,10 +68,15 @@ public class HomeFragment extends Fragment {
         viewModel = ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
         loginViewModel = ViewModelProviders.of(requireActivity()).get(LoginViewModel.class);
         signupViewModel = ViewModelProviders.of(requireActivity()).get(SignupViewModel.class);
-        mPostsAdapter = new PostsAdapter(getContext());
+        mPostsAdapter = new PostsAdapter(getContext(), this);
 
         mPostsAdapter.setClientsList(viewModel.getClientsList());
         mPostsAdapter.setFreelancersList(viewModel.getFreelancersList());
+
+        items.addAll(viewModel.getClientsList());
+        items.addAll(viewModel.getFreelancersList());
+
+        username = SaveSharedPreference.getUsername(getContext());
 
     }
 
@@ -105,14 +118,29 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final NavController navController = Navigation.findNavController(view);
+        navController = Navigation.findNavController(view);
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
                 new OnBackPressedCallback(true) {
                     @Override
                     public void handleOnBackPressed() {
-                        navController.popBackStack();
-                        requireActivity().finish();
+                        if (username.equals("freelancer1")
+                        || username.equals("freelancer2")
+                        || username.equals("freelancer3")
+                        || username.equals("freelancer4")
+                        || username.equals("freelancer5")
+                        || username.equals("client1")
+                        || username.equals("client2")
+                        || username.equals("client3")
+                        || username.equals("client4")
+                        || username.equals("client5")){
+                            navController.popBackStack();
+                            requireActivity().finish();
+                        }else{
+                            loginViewModel.logOut(getContext());
+                            navController.popBackStack();
+                            requireActivity().finish();
+                        }
                     }
                 });
 
@@ -160,5 +188,19 @@ public class HomeFragment extends Fragment {
     private void showWlecomeMessage() {
         Toast toast = Toast.makeText(getContext(), "Welcome Home! " + SaveSharedPreference.getUsername(getContext()), Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    private void navigateToEditProfile(String username){
+        HomeFragmentDirections.HomeToProfileAction action = HomeFragmentDirections.homeToProfileAction();
+        action.setUsernameArg(username);
+        navController.navigate(action);
+    }
+
+    @Override
+    public void onPostClicked(int position) {
+        User user = (User)items.get(position);
+        if (!user.getUserName().equals(this.username)) {
+            navigateToEditProfile(user.getUserName());
+        }
     }
 }

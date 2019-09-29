@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.freelanceproject.Adapters.ProjectAdapter;
@@ -35,6 +36,7 @@ import com.example.freelanceproject.BusinessModel.User;
 import com.example.freelanceproject.Util.SaveSharedPreference;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -49,7 +51,8 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = ProfileFragment.class.getSimpleName();
 
     // TODO: 9/12/2019 Design the profile layout and set up the fragment to show user info and allow him to change it (DONE)
-    // TODO: 9/16/2019 Allow user to edit their data
+    // TODO: 9/16/2019 Allow user to edit their data (DONE)
+    // TODO: 9/29/2019 Add on click listeners and allow one's to see other users profile (DONE)
 
     private Toolbar mToolbar;
     private AppBarLayout mAppBarLayout;
@@ -59,7 +62,8 @@ public class ProfileFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProjectAdapter mProjectAdapter;
 
-    private MaterialTextView userSkills, userCred, userMinRate, userMaxRate;
+    private MaterialTextView userSkills, userCred, userMinRate, userMaxRate, ratesSeparator;
+    private FloatingActionButton newProjectFab;
 
     private MainViewModel viewModel;
     private LoginViewModel loginViewModel;
@@ -91,7 +95,9 @@ public class ProfileFragment extends Fragment {
         userSkills = view.findViewById(R.id.skills_text_view);
         userCred = view.findViewById(R.id.cred_score_text_view);
         userMinRate = view.findViewById(R.id.min_rates_text_view);
+        ratesSeparator = view.findViewById(R.id.rates_separator);
         userMaxRate = view.findViewById(R.id.max_rates_text_view);
+        newProjectFab = view.findViewById(R.id.profile_new_project_fab);
         setHasOptionsMenu(true);
 
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -102,11 +108,15 @@ public class ProfileFragment extends Fragment {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0){
-                    MenuItem editProfileItem = mMenu.findItem(R.id.edit_menu_edit_profile_item);
-                    editProfileItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    if (hasOptionsMenu()) {
+                        MenuItem editProfileItem = mMenu.findItem(R.id.edit_menu_edit_profile_item);
+                        editProfileItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    }
                 }else {
-                    MenuItem editProfileItem = mMenu.findItem(R.id.edit_menu_edit_profile_item);
-                    editProfileItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                    if (hasOptionsMenu()) {
+                        MenuItem editProfileItem = mMenu.findItem(R.id.edit_menu_edit_profile_item);
+                        editProfileItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                    }
                 }
             }
         });
@@ -128,7 +138,15 @@ public class ProfileFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mProjectAdapter.setProjectsList(mProjectsList);
         recyclerView.setAdapter(mProjectAdapter);
-        mCollapsingToolbar.setTitle(mUser.getName().trim());
+        mCollapsingToolbar.setTitle(mUser.getName().trim().toUpperCase());
+
+        // TODO: 9/28/2019 Create a new destination to create a new project when the user clicks on the fab
+        newProjectFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Add new Project", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -136,8 +154,8 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
-        AppBarConfiguration appBarConfiguration
-                = new AppBarConfiguration.Builder(R.id.profile_dest).build();
+//        AppBarConfiguration appBarConfiguration
+//                = new AppBarConfiguration.Builder(R.id.profile_dest).build();
         /*
           this line causes the ui to lag and show the name of other fragments when navigating to them.
          */
@@ -148,18 +166,26 @@ public class ProfileFragment extends Fragment {
         }else {
             acc_type = User.FREELANCER_ACCOUNT;
         }
-
-        Log.i(TAG, "onViewCreated: " + viewModel.getUser(username));
-        if (viewModel.getUser(username) != null){
-            switch (acc_type){
-                case Client.CLIENT_ACCOUNT:
-                    mUser = (Client)viewModel.getUser(username);
-                    break;
-                case Client.FREELANCER_ACCOUNT:
-                    mUser = (Freelancer)viewModel.getUser(username);
-                    break;
+        Log.i(TAG, "onViewCreated: " + ProfileFragmentArgs.fromBundle(getArguments()).getUsernameArg());
+        if (ProfileFragmentArgs.fromBundle(getArguments()).getUsernameArg() != null){
+            mUser = (User)viewModel.getUser(ProfileFragmentArgs.fromBundle(getArguments()).getUsernameArg());
+            acc_type = mUser.getAccType();
+            setHasOptionsMenu(false);
+            newProjectFab.setVisibility(View.GONE);
+        }else{
+            Log.i(TAG, "onViewCreated: " + viewModel.getUser(username));
+            if (viewModel.getUser(username) != null){
+                switch (acc_type){
+                    case Client.CLIENT_ACCOUNT:
+                        mUser = (Client)viewModel.getUser(username);
+                        break;
+                    case Client.FREELANCER_ACCOUNT:
+                        mUser = (Freelancer)viewModel.getUser(username);
+                        break;
+                }
             }
         }
+
         mProjectsList = mUser.getPortfolio() != null? mUser.getPortfolio().getProjects() : new ArrayList<Project>();
 
 
@@ -171,6 +197,8 @@ public class ProfileFragment extends Fragment {
             userSkills.setText(getSkillsString(((Freelancer)mUser).getSkills()));
             userMinRate.setText(mUser.getRatesMin() + Currency.getInstance(Locale.US).getSymbol());
             userMaxRate.setText(mUser.getRatesMax() + Currency.getInstance(Locale.US).getSymbol());
+        }else{
+            ratesSeparator.setVisibility(View.GONE);
         }
     }
 

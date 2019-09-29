@@ -33,12 +33,15 @@ import android.view.inputmethod.EditorInfo;
 import com.example.freelanceproject.Adapters.PostsAdapter;
 import com.example.freelanceproject.BusinessModel.Client;
 import com.example.freelanceproject.BusinessModel.Freelancer;
+import com.example.freelanceproject.BusinessModel.User;
+import com.example.freelanceproject.Util.OnPostListner;
+import com.example.freelanceproject.Util.SaveSharedPreference;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements OnPostListner {
 
     private static final String TAG = SearchFragment.class.getSimpleName();
     /**
@@ -58,6 +61,7 @@ public class SearchFragment extends Fragment {
     private String searchQuery;
     private String searchText;
 
+    private String username;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -66,10 +70,12 @@ public class SearchFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
-        mPostsAdapter = new PostsAdapter(getContext());
+        mPostsAdapter = new PostsAdapter(getContext(), this);
 
         mPostsAdapter.setClientsList(viewModel.getClientsList());
         mPostsAdapter.setFreelancersList(viewModel.getFreelancersList());
+
+        username = SaveSharedPreference.getUsername(getContext());
 
     }
 
@@ -110,7 +116,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        navController = Navigation.findNavController(view);
     }
 
     @Override
@@ -139,5 +145,25 @@ public class SearchFragment extends Fragment {
             }
         });
 
+    }
+
+    private void navigateToEditProfile(String username){
+        SearchFragmentDirections.SearchToProfileAction action = SearchFragmentDirections.searchToProfileAction();
+        action.setUsernameArg(username);
+        navController.navigate(action);
+    }
+
+    @Override
+    public void onPostClicked(int position) {
+        Log.i(TAG, "onPostClickedSearch: Position" + position);
+        User user = mPostsAdapter.getFilterdSearchList() != null? (User)mPostsAdapter.getFilterdSearchList().get(position): null;
+
+        // TODO: 9/29/2019 fix case when user return from profile after searching
+
+        if (user != null) {
+            if (!user.getUserName().equals(this.username)) {
+                navigateToEditProfile(user.getUserName());
+            }
+        }
     }
 }

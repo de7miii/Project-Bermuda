@@ -21,6 +21,7 @@ import com.example.freelanceproject.R;
 import com.example.freelanceproject.Util.DiffUtil.ClientsListDiffCallback;
 import com.example.freelanceproject.Util.DiffUtil.FreelancerListDiffCallback;
 import com.example.freelanceproject.Util.DiffUtil.ObjectListDiffCallback;
+import com.example.freelanceproject.Util.OnPostListner;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -38,11 +39,16 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private ArrayList<Object> items = new ArrayList<>();
     private ArrayList<Object> itemsFull = new ArrayList<>(items);
+    private ArrayList<Object> itemsFilterd;
+
 
     private Context mContext;
 
-    public PostsAdapter(Context context) {
+    private OnPostListner mOnPostListner;
+
+    public PostsAdapter(Context context, OnPostListner onPostListner) {
         mContext = context;
+        mOnPostListner = onPostListner;
     }
 
     public PostsAdapter(Context context, ArrayList<Client> clientsList, ArrayList<Freelancer> freelancersList) {
@@ -57,9 +63,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         View view = LayoutInflater.from(mContext).inflate(R.layout.card_view_home, parent, false);
 
         if (viewType == ITEM_TYPE_CLIENT){
-            return new ClientViewHolder(view);
+            return new ClientViewHolder(view, mOnPostListner);
         }else{
-            return new FreelancerViewHolder(view);
+            return new FreelancerViewHolder(view, mOnPostListner);
         }
     }
 
@@ -105,11 +111,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return items!= null ? items.size() : 0;
     }
 
-    class FreelancerViewHolder extends RecyclerView.ViewHolder{
+    class FreelancerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView displayImg;
         private MaterialTextView nameTxtView, skillsTxtView, credScoreTxtView, minRatesTxtView, maxRatesTxtView, descTxtView;
+        private OnPostListner mOnPostListner;
 
-        public FreelancerViewHolder(@NonNull View itemView) {
+        public FreelancerViewHolder(@NonNull View itemView, OnPostListner onPostListner) {
             super(itemView);
             displayImg = itemView.findViewById(R.id.display_picture_image_view);
             nameTxtView = itemView.findViewById(R.id.user_name_text_view);
@@ -118,6 +125,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             minRatesTxtView = itemView.findViewById(R.id.min_rates_text_view);
             maxRatesTxtView = itemView.findViewById(R.id.max_rates_text_view);
             descTxtView = itemView.findViewById(R.id.description_text_view);
+            mOnPostListner = onPostListner;
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Freelancer freelancer){
@@ -130,13 +139,19 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Glide.with(mContext).load("https://via.placeholder.com/350x250.png?text=Placeholder+Image")
                     .into(displayImg);
         }
+
+        @Override
+        public void onClick(View v) {
+            mOnPostListner.onPostClicked(getAdapterPosition());
+        }
     }
 
-    class ClientViewHolder extends RecyclerView.ViewHolder{
+    class ClientViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView displayImg;
         private MaterialTextView nameTxtView, skillsTxtView, credScoreTxtView, minRatesTxtView, maxRatesTxtView, descTxtView;
+        private OnPostListner mOnPostListner;
 
-        public ClientViewHolder(@NonNull View itemView) {
+        public ClientViewHolder(@NonNull View itemView, OnPostListner onPostListner) {
             super(itemView);
             displayImg = itemView.findViewById(R.id.display_picture_image_view);
             nameTxtView = itemView.findViewById(R.id.user_name_text_view);
@@ -145,6 +160,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             minRatesTxtView = itemView.findViewById(R.id.min_rates_text_view);
             maxRatesTxtView = itemView.findViewById(R.id.max_rates_text_view);
             descTxtView = itemView.findViewById(R.id.description_text_view);
+            mOnPostListner = onPostListner;
+            itemView.setOnClickListener(this);
+
         }
 
         public void bind(Client client){
@@ -156,6 +174,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             descTxtView.setText(client.getDescription());
             Glide.with(mContext).load("https://via.placeholder.com/350x250.png?text=Placeholder+Image")
                     .into(displayImg);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mOnPostListner.onPostClicked(getAdapterPosition());
         }
     }
 
@@ -229,8 +252,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     if (((User)obj).getUserName().toLowerCase().contains(filterPattern)){
                         Log.i(TAG, "performFiltering: Username: " + ((User)obj).getUserName());
                         filteredList.add(obj);
-                    }
-                    if (((User)obj).getName().toLowerCase().contains(filterPattern)){
+                    }else if (((User)obj).getName().toLowerCase().contains(filterPattern)){
                         Log.i(TAG, "performFiltering: Name: " + ((User)obj).getName());
                         filteredList.add(obj);
                     }
@@ -245,7 +267,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         protected void publishResults(CharSequence constraint, FilterResults results) {
             items.clear();
             items.addAll((ArrayList)results.values);
+            itemsFilterd = new ArrayList<>();
+            itemsFilterd.addAll((ArrayList)results.values);
             notifyDataSetChanged();
         }
     };
+
+    public ArrayList<Object> getFilterdSearchList(){
+        if (itemsFilterd != null){
+            return itemsFilterd;
+        }else{
+            return itemsFull;
+        }
+    }
 }
